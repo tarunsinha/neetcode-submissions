@@ -1,32 +1,34 @@
 public class Solution {
-    public string Encode(IList<string> strs) {
-        StringBuilder sb = new();
-        foreach (var s in strs) sb.Append(s.Length).Append('#').Append(s);
-
-        return sb.ToString();
-    }
-    // 5#hello5#World
-    public List<string> Decode(string s) {
+    public int[] ProductExceptSelf(int[] nums) {
         /*
-        - start from 0 -> till you find the separator ('#')
-        - find the substring to get the length of the word in this case 5
-        - move i -> j+1 to point at 'h'
-        - move j to end -> j+length
-        - add into a list substring from i -> length of word
-        - move i -> j so that i now points at seconf 5
+        - Brute force for every number, iterate from i+1 till end and
+            create a product
+        ## Optimised Soln
+        - Create a prefix array of products
+        - Create a suffix array
+        - return pref[i]* suff[i] into an array
+        ex:
+        nums = [-1,0,1,2,3]
+        pref = []
+        suff = []
         */
-        int i = 0;
-        var res = new List<string>();
-        while (s.Length > i) {
-            int j = i;
-            while (s[j] != '#') j++;
+        var n = nums.Length;
+        var res = new int[n];
+        var pref = new int[n];
+        var suff = new int[n];
+        pref[0] = 1;
+        suff[n - 1] = 1;
 
-            int length = int.Parse(s.Substring(i, j - i));  // j-i to control overflow
+        for (int i = 1; i < n; i++) {
+            pref[i] = pref[i - 1] * nums[i - 1];
+        }
 
-            i = j + 1;
-            j = i + length;
-            res.Add(s.Substring(i, length));
-            i = j;
+        for (int i = n - 2; i >= 0; i--) {
+            suff[i] = suff[i + 1] * nums[i + 1];
+        }
+
+        for (int i = 0; i < n; i++) {
+            res[i] = pref[i] * suff[i];
         }
         return res;
     }
